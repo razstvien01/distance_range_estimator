@@ -26,7 +26,7 @@ void loop() {
   }
   client.loop();
   // Send data to Flutter app
-  client.publish(mqttTopic, "Hello from ESP8266");
+  client.publish(mqttTopic, "Hello Nicolen from ESP8266");
   delay(5000);
 }
 
