@@ -1,6 +1,28 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:mqtt_client/mqtt_client.dart';
+import 'package:mqtt_client/mqtt_server_client.dart';
 
-void main() {
+String generateClientId() {
+  return 'FlutterClient_${Random().nextInt(1000)}';
+}
+
+void main() async {
+  final MqttServerClient client = MqttServerClient('test.mosquitto.org', generateClientId());
+  
+  client.logging(on: true);
+  client.keepAlivePeriod = 20;
+  
+  await client.connect();
+  
+  client.subscribe("distance_range_estimator", MqttQos.atMostOnce);
+  
+  client.updates?.listen((List<MqttReceivedMessage<MqttMessage>> c) {
+    final MqttPublishMessage recMess = c[0].payload as MqttPublishMessage;
+    final String message = MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
+    print('Received message: $message');
+  });
+  
   runApp(const MyApp());
 }
 
