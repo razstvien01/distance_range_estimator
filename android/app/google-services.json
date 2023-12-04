@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "689632252670",
+    "project_id": "distance-range-estimator",
+    "storage_bucket": "distance-range-estimator.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:689632252670:android:c84696053142261a040baf",
+        "android_client_info": {
+          "package_name": "com.example.distance_range_estimator"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBGsU8FdoaK9S4Fr_mdttYbnnNan90GR5c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

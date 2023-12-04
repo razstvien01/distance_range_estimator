@@ -15,7 +15,7 @@ PubSubClient client(espClient);
 
 // Declare the variables
 unsigned long lastMsg = 0; // To store the time when the last message was sent
-long temperature;          // To store the temperature value
+long distance;          // To store the distance value
 char msg[50];              // To store the message to be sent
 
 void setup_wifi() {
@@ -61,8 +61,8 @@ void loop() {
     // Publish a message roughly every two seconds
     if (millis() - lastMsg > 2000) {
         lastMsg = millis();
-        temperature = random(20, 30); // Generate a random temperature value
-        snprintf(msg, 50, "Temperature: %ld", temperature);
+        distance = random(1, 400); // Generate a random distance value
+        snprintf(msg, 50, "Current Distance: %ld cm", distance);
         Serial.print("Publish message: ");
         Serial.println(msg);
         client.publish(topic, msg);
