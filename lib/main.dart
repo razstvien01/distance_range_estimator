@@ -27,6 +27,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter MQTT Demo',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -48,7 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    connect();
+    // connect();
   }
 
   void connect() async {
@@ -106,9 +107,10 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text("Distance Range Estimator"),
       ),
-      body: Center(
-        child: Text(receivedMessage),
-      ),
+      body: Text("Current Distance: 20 cm"),
+      // body: Center(
+      //   child: Text(receivedMessage),
+      // ),
     );
   }
 

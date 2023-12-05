@@ -21,13 +21,16 @@ PubSubClient client(espClient);
 // Declare the variables
 unsigned long lastMsg = 0;
 long distance;
+int duration;
 char msg[50];
 
-// Button setup
+// Pins
 const int buttonPin = D2;  // Change D3 to your ESP8266 GPIO pin connected to the button
 bool lastButtonState = LOW;
 int ledSendPin = D1;
 int ledConnectionPin = D5;
+const int trigPin = D6;
+const int echoPin = D7;
 
 void setup_wifi() {
   // Connect to Wi-Fi
@@ -39,6 +42,8 @@ void setup_wifi() {
   }
   pinMode(ledSendPin, OUTPUT);
   pinMode(ledConnectionPin, OUTPUT);
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
   Serial.println("WiFi connected");
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
@@ -53,6 +58,12 @@ void setup() {
 }
 
 void loop() {
+  // digitalWrite(trigPin, LOW);
+  // delayMicroseconds(2);
+
+  // digitalWrite(trigPin);
+
+
   digitalWrite(ledSendPin, HIGH);
   if (!client.connected()) {
     while (!client.connected()) {
