@@ -2,8 +2,13 @@
 #include <PubSubClient.h>
 
 // Network credentials
-const char* ssid = "HG8145V5_0484D";
-const char* password = "PZz6VKmu";
+// const char* ssid = "HG8145V5_0484D";
+// const char* password = "PZz6VKmu";
+// const char* ssid = "Nicolen";
+// const char* password = "00000000";
+
+const char* ssid = "Narzo50";
+const char* password = "123456789";
 
 // MQTT Broker
 const char* mqtt_broker = "broker.hivemq.com";
@@ -48,7 +53,7 @@ void setup() {
 }
 
 void loop() {
-
+  digitalWrite(ledSendPin, HIGH);
   if (!client.connected()) {
     while (!client.connected()) {
       digitalWrite(ledConnectionPin, LOW);
@@ -56,6 +61,14 @@ void loop() {
       if (client.connect("ESP8266Client")) {
         digitalWrite(ledConnectionPin, HIGH);
         Serial.println("connected");
+
+        distance = random(1, 400);
+        snprintf(msg, 50, "Current Distance: %ld cm", distance);
+        Serial.print("Publish message: ");
+        Serial.println(msg);
+        client.publish(topic, msg);
+        lastMsg = millis();
+
       } else {
         Serial.print("failed, rc=");
         Serial.print(client.state());
@@ -65,24 +78,22 @@ void loop() {
     }
   }
 
-  // client.loop();
+  client.loop();
 
-  bool buttonState = digitalRead(buttonPin);
-  if (buttonState == HIGH && lastButtonState == LOW && client.connected()) {
+  // bool buttonState = digitalRead(buttonPin);
+  // if (buttonState == HIGH && lastButtonState == LOW && client.connected()) {
 
-    // Button is pressed
-    distance = random(1, 400);  // Generate a random distance value
-    snprintf(msg, 50, "Current Distance: %ld cm", distance);
-    Serial.print("Publish message: ");
-    Serial.println(msg);
-    client.publish(topic, msg);
-    lastMsg = millis();
-    digitalWrite(ledSendPin, HIGH);  // Turn the LED on
-    delay(50);                      // Wait for a second
-    digitalWrite(ledSendPin, LOW);   // Turn the LED off
-    delay(50);
-  }
-  lastButtonState = buttonState;  // Update the last button state
-
-  
+  //   // Button is pressed
+  //   distance = random(1, 400);  // Generate a random distance value
+  //   snprintf(msg, 50, "Current Distance: %ld cm", distance);
+  //   Serial.print("Publish message: ");
+  //   Serial.println(msg);
+  //   client.publish(topic, msg);
+  //   lastMsg = millis();
+  //   digitalWrite(ledSendPin, HIGH);  // Turn the LED on
+  //   delay(50);                      // Wait for a second
+  //   digitalWrite(ledSendPin, LOW);   // Turn the LED off
+  //   delay(50);
+  // }
+  // lastButtonState = buttonState;  // Update the last button state
 }

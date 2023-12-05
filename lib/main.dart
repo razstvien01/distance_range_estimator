@@ -54,7 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void connect() async {
     client.setProtocolV311();
     client.logging(on: true);
-    client.keepAlivePeriod = 30;
+    client.keepAlivePeriod = 5;
     client.onDisconnected = onDisconnected;
     client.onConnected = onConnected;
     client.onSubscribed = onSubscribed;
