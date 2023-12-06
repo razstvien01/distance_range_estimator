@@ -120,7 +120,7 @@ class _MyHomePageState extends State<MyHomePage> {
         appBar: AppBar(
           centerTitle: true,
           backgroundColor: kPrimaryColor,
-          title: Text("Distance Range Estimator", style: kHeadTextStyle),
+          title: const Text("Distance Range Estimator", style: kHeadTextStyle),
         ),
         body: HomeScreen()
         );
