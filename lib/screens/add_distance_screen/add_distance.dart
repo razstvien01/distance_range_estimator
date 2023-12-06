@@ -5,7 +5,7 @@ import 'package:distance_range_estimator/widgets/image_list.dart';
 import 'package:flutter/material.dart';
 
 class AddDistanceScreen extends StatefulWidget {
-  AddDistanceScreen({super.key});
+  const AddDistanceScreen({super.key});
 
   @override
   State<AddDistanceScreen> createState() => _AddDistanceScreenState();
