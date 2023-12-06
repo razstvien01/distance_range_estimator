@@ -1,4 +1,8 @@
-import 'package:distance_range_estimator/widgets/default-button.dart';
+import 'package:distance_range_estimator/screens/add_area_screen/add_area.dart';
+import 'package:distance_range_estimator/screens/home_screen/home.dart';
+import 'package:distance_range_estimator/types/constants.dart';
+import 'package:distance_range_estimator/widgets/area_list.dart';
+import 'package:distance_range_estimator/widgets/default_button.dart';
 import 'package:flutter/material.dart';
 
 //* MQTT Libraries
@@ -29,6 +33,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      routes: {
+        '/add_area': (context) => const AddArea(),
+      },
       title: 'Flutter MQTT Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -69,7 +76,6 @@ class _MyHomePageState extends State<MyHomePage> {
     try {
       await client.connect();
     } catch (e) {
-      print('Exception: $e');
       client.disconnect();
     }
 
@@ -110,26 +116,14 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Distance Range Estimator"),
-      ),
-      // body: Text("Current Distance: 20 cm"),
-      body: Column(
-        children: [
-          Text("Current Distance: 20 cm"),
-          DefaultButton(btnText: "Save", onPressed: () => {
-            print("Button clicked")
-          }),
-          
-          DefaultButton(btnText: "Create Area", onPressed: () => {
-            print("Button clicked")
-          })
-        ],
-      )
-      // body: Center(
-      //   child: Text(receivedMessage),
-      // ),
-    );
+        backgroundColor: kBGColor,
+        appBar: AppBar(
+          centerTitle: true,
+          backgroundColor: kPrimaryColor,
+          title: Text("Distance Range Estimator", style: kHeadTextStyle),
+        ),
+        body: HomeScreen()
+        );
   }
 
   @override
