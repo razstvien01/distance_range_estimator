@@ -7,7 +7,7 @@ class DefaultTextField extends StatelessWidget {
   final IconData icon;
   final TextEditingController controller;
   final validator;
-  final keyBoardType, obscurText;
+  final keyboardType, obscureText;
   int maxLines;
   VoidCallback? isObscure;
 
@@ -16,9 +16,9 @@ class DefaultTextField extends StatelessWidget {
     required this.hintText,
     required this.icon,
     required this.controller,
-    required this.keyBoardType,
+    required this.keyboardType,
     required this.validator,
-    this.obscurText = false,
+    this.obscureText = false,
     this.isObscure,
     this.maxLines = 1,
   });
@@ -28,9 +28,12 @@ class DefaultTextField extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: kDefaultPadding),
       padding: const EdgeInsets.symmetric(horizontal: kDefaultFontSize),
-      decoration: BoxDecoration(
-          borderRadius: const BorderRadius.all(Radius.circular(kDefaultRad)),
-          color: kAccentColor),
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.all(
+          Radius.circular(kDefaultRad),
+        ),
+        color: kBGColor,
+      ),
       child: TextFormField(
         //maxLines: null,
         minLines: 1,
@@ -48,7 +51,7 @@ class DefaultTextField extends StatelessWidget {
           fillColor: kAccentColor,
           icon: Icon(
             icon,
-            color: kLightColor,
+            color: kRevColor,
           ),
           suffixIcon: (TextInputType.visiblePassword == keyboardType)
               ? IconButton(

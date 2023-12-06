@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       routes: {
         '/add_area': (context) => const AddAreaScreen(),
-        '/add_distance': (context) => const AddDistanceScreen()
+        '/add_distance': (context) => AddDistanceScreen()
       },
       title: 'Flutter MQTT Demo',
       debugShowCheckedModeBanner: false,

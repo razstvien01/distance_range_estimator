@@ -23,3 +23,5 @@ const kHeadTextStyle = TextStyle(
 
 const kSubTextStyle =
     TextStyle(fontSize: 20.0, color: kRevColor, fontWeight: FontWeight.bold);
+
+const kSmallTextStyle = TextStyle(fontSize: 14.0, color: kRevColor);
