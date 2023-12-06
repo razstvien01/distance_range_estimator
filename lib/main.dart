@@ -1,8 +1,7 @@
 import 'package:distance_range_estimator/screens/add_area_screen/add_area.dart';
+import 'package:distance_range_estimator/screens/add_distance_screen/add_distance.dart';
 import 'package:distance_range_estimator/screens/home_screen/home.dart';
 import 'package:distance_range_estimator/types/constants.dart';
-import 'package:distance_range_estimator/widgets/area_list.dart';
-import 'package:distance_range_estimator/widgets/default_button.dart';
 import 'package:flutter/material.dart';
 
 //* MQTT Libraries
@@ -34,7 +33,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       routes: {
-        '/add_area': (context) => const AddArea(),
+        '/add_area': (context) => const AddAreaScreen(),
+        '/add_distance': (context) => const AddDistanceScreen()
       },
       title: 'Flutter MQTT Demo',
       debugShowCheckedModeBanner: false,

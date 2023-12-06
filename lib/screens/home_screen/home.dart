@@ -18,14 +18,16 @@ class _HomeScreenState extends State<HomeScreen> {
         const Flexible(
           flex: 1,
           child: Padding(
-            padding: const EdgeInsets.only(top: 20.0),
+            padding: EdgeInsets.only(top: 20.0),
             child: Text("Current Distance: 20 cm", style: kSubTextStyle),
           ),
         ),
         Flexible(
           flex: 1,
           child: DefaultButton(
-              btnText: "Save", onPressed: () => {print("Button clicked")}),
+              btnText: "Save",
+              onPressed: () =>
+                  {Navigator.of(context).pushNamed('/add_distance')}),
         ),
         const Flexible(flex: 5, child: AreaList()),
         Flexible(
