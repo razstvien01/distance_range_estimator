@@ -2,13 +2,13 @@
 #include <PubSubClient.h>
 
 // Network credentials
-// const char* ssid = "HG8145V5_0484D";
-// const char* password = "PZz6VKmu";
+const char* ssid = "HG8145V5_0484D";
+const char* password = "PZz6VKmu";
 // const char* ssid = "Nicolen";
 // const char* password = "00000000";
 
-const char* ssid = "Narzo50";
-const char* password = "123456789";
+// const char* ssid = "Narzo50";
+// const char* password = "123456789";
 
 // MQTT Broker
 const char* mqtt_broker = "broker.hivemq.com";
@@ -58,18 +58,7 @@ void setup() {
 }
 
 void loop() {
-  digitalWrite(trigPin, LOW);
-  delayMicroseconds(2);
-
-  digitalWrite(trigPin, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(trigPin, LOW);
-
-  duration = pulseIn(echoPin, HIGH);
-  distance = duration * 0.034 / 2;
-
-  Serial.print(distance);
-
+  
   digitalWrite(ledSendPin, HIGH);
   if (!client.connected()) {
     while (!client.connected()) {
@@ -80,7 +69,7 @@ void loop() {
         Serial.println("connected");
 
         // distance = random(1, 400);
-        snprintf(msg, 50, "Current Distance: %ld cm", distance);
+        snprintf(msg, 50, "%ld", distance);
         Serial.print("Publish message: ");
         Serial.println(msg);
         client.publish(topic, msg);

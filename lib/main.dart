@@ -1,3 +1,7 @@
+import 'dart:typed_data';
+import 'dart:convert';
+import 'package:typed_data/typed_buffers.dart';
+
 import 'package:distance_range_estimator/screens/add_area_screen/add_area.dart';
 import 'package:distance_range_estimator/screens/add_distance_screen/add_distance.dart';
 import 'package:distance_range_estimator/screens/home_screen/home.dart';
@@ -75,7 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    // connect();
+    connect();
   }
 
   void connect() async {
@@ -165,10 +169,44 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ),
             ),
-            actions: [DefaultButton(btnText: "Submit", onPressed: () => {
-              Navigator.of(context).pop()
-            })],
+            actions: [
+              DefaultButton(
+                  btnText: "Submit",
+                  onPressed: () {
+                    publishSSIDAndPassword(
+                        _ssidController.text, _passwordController.text);
+                    // Navigator.of(context).pop();
+                  }),
+            ],
           ));
+
+  void publishSSIDAndPassword(String ssid, String password) {
+    final String topic = "esp8266/config"; // The topic to publish to
+    final String message =
+        'SSID:$ssid;PASSWORD:$password'; // Or use JSON format
+
+    print("Hello world 1");
+
+    if (client.connectionStatus?.state == mqtt.MqttConnectionState.connected) {
+      final Uint8List data = Uint8List.fromList(utf8.encode(message));
+
+      print("Hello world 2");
+
+      final Uint8Buffer buffer = Uint8Buffer();
+      buffer.addAll(data);
+
+      print("Hello world 3");
+
+      client.publishMessage(
+        topic,
+        mqtt.MqttQos.atLeastOnce,
+        buffer,
+      );
+      print('Message published: $message to topic: $topic');
+    } else {
+      print('MQTT Client is not connected. Cannot send message.');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -186,7 +224,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 //   MaterialPageRoute(builder: (context) => const NotificationUI()),
                 // );
                 openDialog();
-                
+
                 _ssidController.text = "";
                 _passwordController.text = "";
               },
@@ -197,6 +235,6 @@ class _MyHomePageState extends State<MyHomePage> {
             )
           ],
         ),
-        body: HomeScreen());
+        body: HomeScreen(message: receivedMessage));
   }
 }

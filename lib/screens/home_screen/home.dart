@@ -4,22 +4,31 @@ import 'package:distance_range_estimator/widgets/default_button.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final String message; // Remove the const keyword
+  HomeScreen({super.key, required this.message});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
+
 class _HomeScreenState extends State<HomeScreen> {
+  
   @override
   Widget build(BuildContext context) {
+    
     return Column(
       children: [
-        const Flexible(
+        Flexible(
           flex: 1,
           child: Padding(
             padding: EdgeInsets.only(top: 20.0),
-            child: Text("Current Distance: 20 cm", style: kSubTextStyle),
+            child: Column(
+              children: [
+                Text("Current Distance:", style: kSubTextStyle),
+                Text("${widget.message} cm", style: kHeadTextStyle),
+              ],
+            ),
           ),
         ),
         Flexible(
