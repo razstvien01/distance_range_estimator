@@ -2,6 +2,8 @@ import 'package:distance_range_estimator/screens/add_area_screen/add_area.dart';
 import 'package:distance_range_estimator/screens/add_distance_screen/add_distance.dart';
 import 'package:distance_range_estimator/screens/home_screen/home.dart';
 import 'package:distance_range_estimator/types/constants.dart';
+import 'package:distance_range_estimator/widgets/default_button.dart';
+import 'package:distance_range_estimator/widgets/default_textfield.dart';
 import 'package:flutter/material.dart';
 
 //* MQTT Libraries
@@ -55,6 +57,17 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final _ssidController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _ssidController.dispose();
+    _passwordController.dispose();
+    client.disconnect();
+    super.dispose();
+  }
+
   final mqtt.MqttServerClient client =
       mqtt.MqttServerClient('broker.hivemq.com', '');
   String receivedMessage = 'Waiting for messages...';
@@ -113,6 +126,50 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  Future openDialog() => showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+            backgroundColor: kPrimaryColor,
+            title: const Text(
+              'Connect the embedded device to the SSID',
+              style: kSubTextStyle,
+            ),
+            content: SizedBox(
+              height: 140.0,
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: DefaultTextField(
+                      hintText: "Enter SSID",
+                      icon: Icons.ssid_chart,
+                      controller: _ssidController,
+                      keyboardType: TextInputType.text,
+                      validator: (value) {
+                        return null;
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: DefaultTextField(
+                      hintText: "Enter Password",
+                      icon: Icons.password,
+                      controller: _passwordController,
+                      keyboardType: TextInputType.visiblePassword,
+                      validator: (value) {
+                        return null;
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [DefaultButton(btnText: "Submit", onPressed: () => {
+              Navigator.of(context).pop()
+            })],
+          ));
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -121,14 +178,25 @@ class _MyHomePageState extends State<MyHomePage> {
           centerTitle: true,
           backgroundColor: kPrimaryColor,
           title: const Text("Distance Range Estimator", style: kHeadTextStyle),
+          actions: [
+            IconButton(
+              onPressed: () {
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(builder: (context) => const NotificationUI()),
+                // );
+                openDialog();
+                
+                _ssidController.text = "";
+                _passwordController.text = "";
+              },
+              icon: const Icon(
+                Icons.wifi_find,
+                color: kRevColor,
+              ),
+            )
+          ],
         ),
-        body: HomeScreen()
-        );
-  }
-
-  @override
-  void dispose() {
-    client.disconnect();
-    super.dispose();
+        body: HomeScreen());
   }
 }

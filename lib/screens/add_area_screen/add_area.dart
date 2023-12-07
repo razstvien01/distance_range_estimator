@@ -30,7 +30,13 @@ class CreateAreaScreen extends StatefulWidget {
 class _CreateAreaScreenState extends State<CreateAreaScreen> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
-  final _priceController = TextEditingController();
+  
+  @override
+  void dispose(){
+    _titleController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
 
   // final currUser = FirebaseAuth.instance.currentUser;
 
@@ -134,14 +140,7 @@ class _CreateAreaScreenState extends State<CreateAreaScreen> {
           );
         });
   }
-
-  @override
-  void dispose() {
-    _titleController.dispose();
-    _descriptionController.dispose();
-    super.dispose();
-  }
-
+  
   @override
   Widget build(BuildContext context) {
     double availableHeight = MediaQuery.of(context).size.height -
