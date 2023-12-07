@@ -15,7 +15,14 @@ class AreaList extends StatelessWidget {
     'Area 8',
     'Area 9',
     'Area 9',
-    
+    'Area 7',
+    'Area 8',
+    'Area 9',
+    'Area 9',
+    'Area 7',
+    'Area 8',
+    'Area 9',
+    'Area 9',
     // ... other areas
   ];
 
