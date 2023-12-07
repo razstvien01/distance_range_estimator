@@ -51,6 +51,8 @@ class _CreateAreaScreenState extends State<CreateAreaScreen> {
     // final result = await ref.putFile(File(path));
     // final fileUrl = await result.ref.getDownloadURL();
 
+    print("HELLOOOO WORLDDDDDDD");
+
     setState(() {
       imageUrl = path;
     });
