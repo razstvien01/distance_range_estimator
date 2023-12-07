@@ -7,16 +7,11 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
-// import 'package:line_icons/line_icons.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:distance_range_estimator/types/constants.dart';
-// import 'package:rent_house/models/item_model.dart';
 import 'package:distance_range_estimator/widgets/default_button.dart';
-// import 'package:rent_house/ud_widgets/default_textfield.dart';
 
 import 'package:path/path.dart' as p;
-
-import 'package:intl/intl.dart';
 
 class CreateAreaScreen extends StatefulWidget {
   final VoidCallback refresh;
@@ -39,10 +34,7 @@ class _CreateAreaScreenState extends State<CreateAreaScreen> {
   }
 
   // final currUser = FirebaseAuth.instance.currentUser;
-
-  // final List<String> locations = ['Cebu City, Cebu', 'Talisay City, Cebu'];
-  String? selectedLocation;
-
+  
   final ImagePicker _picker = ImagePicker();
   final List<File> _imageList = [];
 
@@ -164,7 +156,7 @@ class _CreateAreaScreenState extends State<CreateAreaScreen> {
         child: Column(
           children: [
             SizedBox(
-              height: componentHeight,
+              height: componentHeight * 1.5,
               child: Padding(
                 padding: const EdgeInsets.only(top: kDefaultPadding),
                 child: addImageWidget(true),
@@ -212,7 +204,7 @@ class _CreateAreaScreenState extends State<CreateAreaScreen> {
               ),
             ),
             SizedBox(
-              height: componentHeight,
+              height: componentHeight ,
               child: Column(
                 children: [
                   DefaultButton(
