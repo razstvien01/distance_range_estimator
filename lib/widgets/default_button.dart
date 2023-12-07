@@ -15,7 +15,7 @@ class DefaultButton extends StatelessWidget {
     return Container(
       height: 45,
       width: MediaQuery.of(context).size.width,
-      margin: const EdgeInsets.symmetric(vertical: kDefaultPadding),
+      margin: const EdgeInsets.symmetric(vertical: kLessPadding),
       padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding),
       child: TextButton(
         

@@ -58,11 +58,17 @@ void setup() {
 }
 
 void loop() {
-  // digitalWrite(trigPin, LOW);
-  // delayMicroseconds(2);
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
 
-  // digitalWrite(trigPin);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
 
+  duration = pulseIn(echoPin, HIGH);
+  distance = duration * 0.034 / 2;
+
+  Serial.print(distance);
 
   digitalWrite(ledSendPin, HIGH);
   if (!client.connected()) {
@@ -73,7 +79,7 @@ void loop() {
         digitalWrite(ledConnectionPin, HIGH);
         Serial.println("connected");
 
-        distance = random(1, 400);
+        // distance = random(1, 400);
         snprintf(msg, 50, "Current Distance: %ld cm", distance);
         Serial.print("Publish message: ");
         Serial.println(msg);
