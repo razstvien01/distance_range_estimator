@@ -4,10 +4,13 @@ import 'package:flutter/material.dart';
 class DefaultButton extends StatelessWidget {
   final String btnText;
   final VoidCallback onPressed;
+  final bool isDisabled;
+
   const DefaultButton({
     super.key,
     required this.btnText,
-    required this.onPressed
+    required this.onPressed,
+    this.isDisabled = false, // Default is false
   });
 
   @override
@@ -18,18 +21,21 @@ class DefaultButton extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: kLessPadding),
       padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding),
       child: TextButton(
-        
-        onPressed: onPressed,
+        onPressed: isDisabled ? null : onPressed, // Disable if isDisabled is true
         style: TextButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: kLessPadding),
-          backgroundColor: kPrimaryColor,
+          backgroundColor: isDisabled ? Colors.grey : kPrimaryColor, // Optional: Change color when disabled
           foregroundColor: kRevColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(kDefaultRad),
           ),
-          // shape: Roun
         ),
-        child: Text(btnText.toUpperCase()),
+        child: Text(
+          btnText.toUpperCase(),
+          style: TextStyle(
+            color: isDisabled ? Colors.black45 : Colors.white, // Optional: Change text color when disabled
+          ),
+        ),
       ),
     );
   }

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:distance_range_estimator/widgets/default_textfield.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -23,18 +24,20 @@ class CreateAreaScreen extends StatefulWidget {
 }
 
 class _CreateAreaScreenState extends State<CreateAreaScreen> {
+  final area = FirebaseFirestore.instance.collection('area');
+
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
-  
+
   @override
-  void dispose(){
+  void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
     super.dispose();
   }
 
   // final currUser = FirebaseAuth.instance.currentUser;
-  
+
   final ImagePicker _picker = ImagePicker();
   final List<File> _imageList = [];
 
@@ -50,7 +53,7 @@ class _CreateAreaScreenState extends State<CreateAreaScreen> {
 
     // final result = await ref.putFile(File(path));
     // final fileUrl = await result.ref.getDownloadURL();
-  
+
     setState(() {
       imageUrl = path;
     });
@@ -132,7 +135,7 @@ class _CreateAreaScreenState extends State<CreateAreaScreen> {
           );
         });
   }
-  
+
   @override
   Widget build(BuildContext context) {
     double availableHeight = MediaQuery.of(context).size.height -
@@ -204,31 +207,38 @@ class _CreateAreaScreenState extends State<CreateAreaScreen> {
               ),
             ),
             SizedBox(
-              height: componentHeight ,
+              height: componentHeight,
               child: Column(
                 children: [
                   DefaultButton(
                       btnText: 'Save Area',
                       onPressed: () async {
-                        
-                  
                         // String? uid =
                         //     FirebaseAuth.instance.currentUser?.uid;
-                  
-                        // final properties = FirebaseFirestore.instance
-                        //     .collection('properties')
-                        //     .doc(selectedLocation);
-                  
+                        final title = _titleController.text;
+                        final description = _descriptionController.text;
+
+                        try {
+                          await area.add(
+                              {'title': title, 'description': description});
+
+                          // If the operation is successful
+                          print('Data added to Firestore successfully');
+                        } catch (e) {
+                          // If there is an error
+                          print('Error adding data to Firestore: $e');
+                        }
+
                         // await _uploadFile(imageFile.path, true);
-                  
+
                         // for (File f in _imageList) {
                         //   await _uploadFile(f.path, false);
                         // }
-                  
+
                         // DateTime now = DateTime.now();
                         // String formattedDate =
                         //     DateFormat('yyyy-MM-dd – kk:mm:ss').format(now);
-                  
+
                         // Item.recommendation.add(Item(
                         //   _titleController.text.trim(),
                         //   widget.property_type,
@@ -241,7 +251,7 @@ class _CreateAreaScreenState extends State<CreateAreaScreen> {
                         //   false,
                         //   imageUrls,
                         // ));
-                  
+
                         // Item newProperty = Item(
                         //   _titleController.text.trim(),
                         //   widget.property_type,
@@ -254,9 +264,9 @@ class _CreateAreaScreenState extends State<CreateAreaScreen> {
                         //   false,
                         //   imageUrls,
                         // );
-                  
+
                         // Item.nearby.add(newProperty);
-                  
+
                         // properties.update({
                         //   newProperty.dateTime: {
                         //     'title': newProperty.title,
@@ -270,12 +280,11 @@ class _CreateAreaScreenState extends State<CreateAreaScreen> {
                         //     'images': newProperty.images,
                         //   }
                         // });
-                  
-                  
+
                         if (mounted) {
                           widget.refresh();
                         }
-                  
+
                         Navigator.of(context).pop();
                       }),
                 ],
