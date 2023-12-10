@@ -41,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Flexible(
           flex: 1,
           child: DefaultButton(
-              btnText: "Create Area",
+              btnText: "Create Measurements",
               onPressed: () => {Navigator.of(context).pushNamed('/add_area')}),
         )
       ],

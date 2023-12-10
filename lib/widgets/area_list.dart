@@ -7,7 +7,7 @@ import '../screens/detail_area_screen/detail_area.dart';
 
 class AreaList extends StatelessWidget {
   final CollectionReference areaCollection =
-      FirebaseFirestore.instance.collection('area');
+      FirebaseFirestore.instance.collection('measurements');
 
   AreaList({super.key});
 
@@ -16,17 +16,24 @@ class AreaList extends StatelessWidget {
     return StreamBuilder<QuerySnapshot>(
       stream: areaCollection.orderBy('created_at', descending: true).snapshots(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
           return CircularProgressIndicator(); // Loading indicator
         }
 
         final areas = snapshot.data?.docs;
 
+        if (areas == null || areas.isEmpty) {
+          // Show a message when the list is empty
+          return Center(
+            child: Text('No measurements available', style: kSubTextStyle,),
+          );
+        }
+
         return ListView.builder(
           shrinkWrap: true,
-          itemCount: areas?.length,
+          itemCount: areas.length,
           itemBuilder: (context, index) {
-            final areaData = areas?[index].data() as Map<String, dynamic>;
+            final areaData = areas[index].data() as Map<String, dynamic>;
             final areaName = areaData['title'] ??
                 ''; // Replace 'title' with the field name in your Firestore document
             final thumbnailUrl = areaData['thumbnail'] ??
