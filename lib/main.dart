@@ -185,17 +185,11 @@ class _MyHomePageState extends State<MyHomePage> {
     final String message =
         'SSID:$ssid;PASSWORD:$password'; // Or use JSON format
 
-    print("Hello world 1");
-
     if (client.connectionStatus?.state == mqtt.MqttConnectionState.connected) {
       final Uint8List data = Uint8List.fromList(utf8.encode(message));
 
-      print("Hello world 2");
-
       final Uint8Buffer buffer = Uint8Buffer();
       buffer.addAll(data);
-
-      print("Hello world 3");
 
       client.publishMessage(
         topic,

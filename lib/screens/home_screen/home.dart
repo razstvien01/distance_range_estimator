@@ -11,7 +11,6 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-
 class _HomeScreenState extends State<HomeScreen> {
   
   @override
@@ -38,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () =>
                   {Navigator.of(context).pushNamed('/add_distance')}),
         ),
-        const Flexible(flex: 5, child: AreaList()),
+        Flexible(flex: 5, child: AreaList()),
         Flexible(
           flex: 1,
           child: DefaultButton(

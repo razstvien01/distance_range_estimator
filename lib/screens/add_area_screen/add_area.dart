@@ -24,7 +24,7 @@ class CreateAreaScreen extends StatefulWidget {
 }
 
 class _CreateAreaScreenState extends State<CreateAreaScreen> {
-  final area = FirebaseFirestore.instance.collection('area');
+  final measurements = FirebaseFirestore.instance.collection('measurements');
 
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
@@ -46,7 +46,7 @@ class _CreateAreaScreenState extends State<CreateAreaScreen> {
   Future _uploadFile(String path, bool isThumbnail) async {
     final ref = FirebaseStorage.instance
         .ref()
-        .child('areas')
+        .child('measurements')
         .child(DateTime.now().toIso8601String() + p.basename(path));
 
     final result = await ref.putFile(File(path));
@@ -144,7 +144,7 @@ class _CreateAreaScreenState extends State<CreateAreaScreen> {
         toolbarHeight: 80.0,
         centerTitle: true,
         title: const Text(
-          'Create Area',
+          'Create Measurements',
           style: kSubTextStyle,
         ),
         foregroundColor: kRevColor,
@@ -172,7 +172,7 @@ class _CreateAreaScreenState extends State<CreateAreaScreen> {
                         return null;
                       },
                       controller: _titleController,
-                      hintText: 'Area Name',
+                      hintText: 'Measurements Name',
                       icon: Icons.title,
                       keyboardType: TextInputType.text,
                       maxLines: 4,
@@ -207,7 +207,7 @@ class _CreateAreaScreenState extends State<CreateAreaScreen> {
                 children: [
                   DefaultButton(
                       isDisabled: _isDisabled,
-                      btnText: 'Save Area',
+                      btnText: 'Save Measurements',
                       onPressed: () async {
                         _isDisabled = !_isDisabled;
                         // String? uid =
@@ -217,14 +217,15 @@ class _CreateAreaScreenState extends State<CreateAreaScreen> {
 
                         try {
                           await _uploadFile(imageFile.path, true);
-                          await area.add({
+                          await measurements.add({
                             'title': title,
                             'description': description,
-                            'thumbnail': imageUrl
+                            'thumbnail': imageUrl,
+                            'created_at': Timestamp.now(),
                           });
 
                           Fluttertoast.showToast(
-                              msg: "Created area successfully",
+                              msg: "Created measurements successfully",
                               toastLength: Toast.LENGTH_LONG,
                               gravity: ToastGravity.BOTTOM_RIGHT,
                               timeInSecForIosWeb: 1,
@@ -233,7 +234,7 @@ class _CreateAreaScreenState extends State<CreateAreaScreen> {
                               fontSize: 16.0);
                         } catch (e) {
                           Fluttertoast.showToast(
-                              msg: "Failure to create area",
+                              msg: "Failure to create measurements",
                               toastLength: Toast.LENGTH_LONG,
                               gravity: ToastGravity.BOTTOM_RIGHT,
                               timeInSecForIosWeb: 1,
