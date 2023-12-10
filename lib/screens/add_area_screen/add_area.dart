@@ -29,6 +29,7 @@ class _CreateAreaScreenState extends State<CreateAreaScreen> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
 
+  var _isDisabled = false;
   @override
   void dispose() {
     _titleController.dispose();
@@ -36,26 +37,23 @@ class _CreateAreaScreenState extends State<CreateAreaScreen> {
     super.dispose();
   }
 
-  // final currUser = FirebaseAuth.instance.currentUser;
-
   final ImagePicker _picker = ImagePicker();
-  final List<File> _imageList = [];
 
   String? imageUrl;
   List<String?> imageUrls = [];
   late File imageFile = File('');
 
   Future _uploadFile(String path, bool isThumbnail) async {
-    // final ref = FirebaseStorage.instance
-    //     .ref()
-    //     .child('properties')
-    //     .child(DateTime.now().toIso8601String() + p.basename(path));
+    final ref = FirebaseStorage.instance
+        .ref()
+        .child('areas')
+        .child(DateTime.now().toIso8601String() + p.basename(path));
 
-    // final result = await ref.putFile(File(path));
-    // final fileUrl = await result.ref.getDownloadURL();
+    final result = await ref.putFile(File(path));
+    final fileUrl = await result.ref.getDownloadURL();
 
     setState(() {
-      imageUrl = path;
+      imageUrl = fileUrl;
     });
   }
 
@@ -91,15 +89,12 @@ class _CreateAreaScreenState extends State<CreateAreaScreen> {
       return;
     }
 
-    // setState(() {
     imageFile = File(file.path);
-    // });
 
     imageFile = await compressImage(file.path, 35);
 
     setState(() {});
 
-    //await _uploadFile(imageFile.path);
   }
 
   Future _selectPhoto() async {
@@ -148,7 +143,7 @@ class _CreateAreaScreenState extends State<CreateAreaScreen> {
         backgroundColor: kBGColor,
         toolbarHeight: 80.0,
         centerTitle: true,
-        title: Text(
+        title: const Text(
           'Create Area',
           style: kSubTextStyle,
         ),
@@ -211,76 +206,44 @@ class _CreateAreaScreenState extends State<CreateAreaScreen> {
               child: Column(
                 children: [
                   DefaultButton(
+                      isDisabled: _isDisabled,
                       btnText: 'Save Area',
                       onPressed: () async {
+                        _isDisabled = !_isDisabled;
                         // String? uid =
                         //     FirebaseAuth.instance.currentUser?.uid;
                         final title = _titleController.text;
                         final description = _descriptionController.text;
 
                         try {
-                          await area.add(
-                              {'title': title, 'description': description});
+                          await _uploadFile(imageFile.path, true);
+                          await area.add({
+                            'title': title,
+                            'description': description,
+                            'thumbnail': imageUrl
+                          });
 
-                          // If the operation is successful
-                          print('Data added to Firestore successfully');
+                          Fluttertoast.showToast(
+                              msg: "Created area successfully",
+                              toastLength: Toast.LENGTH_LONG,
+                              gravity: ToastGravity.BOTTOM_RIGHT,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: kBGColor,
+                              textColor: kRevColor,
+                              fontSize: 16.0);
                         } catch (e) {
+                          Fluttertoast.showToast(
+                              msg: "Failure to create area",
+                              toastLength: Toast.LENGTH_LONG,
+                              gravity: ToastGravity.BOTTOM_RIGHT,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.red,
+                              textColor: kRevColor,
+                              fontSize: 16.0);
                           // If there is an error
-                          print('Error adding data to Firestore: $e');
                         }
 
-                        // await _uploadFile(imageFile.path, true);
-
-                        // for (File f in _imageList) {
-                        //   await _uploadFile(f.path, false);
-                        // }
-
-                        // DateTime now = DateTime.now();
-                        // String formattedDate =
-                        //     DateFormat('yyyy-MM-dd – kk:mm:ss').format(now);
-
-                        // Item.recommendation.add(Item(
-                        //   _titleController.text.trim(),
-                        //   widget.property_type,
-                        //   selectedLocation,
-                        //   double.parse(_priceController.text.trim()),
-                        //   imageUrl,
-                        //   _descriptionController.text.trim(),
-                        //   uid,
-                        //   formattedDate,
-                        //   false,
-                        //   imageUrls,
-                        // ));
-
-                        // Item newProperty = Item(
-                        //   _titleController.text.trim(),
-                        //   widget.property_type,
-                        //   selectedLocation,
-                        //   double.parse(_priceController.text.trim()),
-                        //   imageUrl,
-                        //   _descriptionController.text.trim(),
-                        //   uid,
-                        //   formattedDate,
-                        //   false,
-                        //   imageUrls,
-                        // );
-
-                        // Item.nearby.add(newProperty);
-
-                        // properties.update({
-                        //   newProperty.dateTime: {
-                        //     'title': newProperty.title,
-                        //     'type': newProperty.category,
-                        //     'location': newProperty.location,
-                        //     'price': newProperty.price,
-                        //     'imageUrl': newProperty.thumb_url,
-                        //     'description': newProperty.description,
-                        //     'uid': newProperty.tenantID,
-                        //     'favorite': false,
-                        //     'images': newProperty.images,
-                        //   }
-                        // });
-
+                        _isDisabled = !_isDisabled;
                         if (mounted) {
                           widget.refresh();
                         }
