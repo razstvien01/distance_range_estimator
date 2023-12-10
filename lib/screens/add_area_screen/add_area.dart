@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:distance_range_estimator/widgets/default_textfield.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -23,48 +24,36 @@ class CreateAreaScreen extends StatefulWidget {
 }
 
 class _CreateAreaScreenState extends State<CreateAreaScreen> {
+  final area = FirebaseFirestore.instance.collection('area');
+
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
-  
+
+  var _isDisabled = false;
   @override
-  void dispose(){
+  void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
     super.dispose();
   }
 
-  // final currUser = FirebaseAuth.instance.currentUser;
-  
   final ImagePicker _picker = ImagePicker();
-  final List<File> _imageList = [];
 
   String? imageUrl;
   List<String?> imageUrls = [];
   late File imageFile = File('');
 
   Future _uploadFile(String path, bool isThumbnail) async {
-    // final ref = FirebaseStorage.instance
-    //     .ref()
-    //     .child('properties')
-    //     .child(DateTime.now().toIso8601String() + p.basename(path));
+    final ref = FirebaseStorage.instance
+        .ref()
+        .child('areas')
+        .child(DateTime.now().toIso8601String() + p.basename(path));
 
-    // final result = await ref.putFile(File(path));
-    // final fileUrl = await result.ref.getDownloadURL();
-
-    print("HELLOOOO WORLDDasdDDDD");
-    print("HELLOOOO WORLDDasdDDDD");
-    print("HELLOOOO WORLDDasdDDDD");
-    print("HELLOOOO WORLDDasdDDDD");
-    print("HELLOOOO WORLDDasdDDDD");
-    print("HELLOOOO WORLDDasdDDDD");
-    print("HELLOOOO WORLDDasdDDDD");
-    print("HELLOOOO WORLDDasdDDDD");
-    print("HELLOOOO WORLDDasdDDDD");
-    print("HELLOOOO WORLDDasdDDDD");
-    print("HELLOOOO WORLDDasdDDDD");
+    final result = await ref.putFile(File(path));
+    final fileUrl = await result.ref.getDownloadURL();
 
     setState(() {
-      imageUrl = path;
+      imageUrl = fileUrl;
     });
   }
 
@@ -100,15 +89,12 @@ class _CreateAreaScreenState extends State<CreateAreaScreen> {
       return;
     }
 
-    // setState(() {
     imageFile = File(file.path);
-    // });
 
     imageFile = await compressImage(file.path, 35);
 
     setState(() {});
 
-    //await _uploadFile(imageFile.path);
   }
 
   Future _selectPhoto() async {
@@ -144,7 +130,7 @@ class _CreateAreaScreenState extends State<CreateAreaScreen> {
           );
         });
   }
-  
+
   @override
   Widget build(BuildContext context) {
     double availableHeight = MediaQuery.of(context).size.height -
@@ -157,7 +143,7 @@ class _CreateAreaScreenState extends State<CreateAreaScreen> {
         backgroundColor: kBGColor,
         toolbarHeight: 80.0,
         centerTitle: true,
-        title: Text(
+        title: const Text(
           'Create Area',
           style: kSubTextStyle,
         ),
@@ -216,78 +202,52 @@ class _CreateAreaScreenState extends State<CreateAreaScreen> {
               ),
             ),
             SizedBox(
-              height: componentHeight ,
+              height: componentHeight,
               child: Column(
                 children: [
                   DefaultButton(
+                      isDisabled: _isDisabled,
                       btnText: 'Save Area',
                       onPressed: () async {
-                        
-                  
+                        _isDisabled = !_isDisabled;
                         // String? uid =
                         //     FirebaseAuth.instance.currentUser?.uid;
-                  
-                        // final properties = FirebaseFirestore.instance
-                        //     .collection('properties')
-                        //     .doc(selectedLocation);
-                  
-                        // await _uploadFile(imageFile.path, true);
-                  
-                        // for (File f in _imageList) {
-                        //   await _uploadFile(f.path, false);
-                        // }
-                  
-                        // DateTime now = DateTime.now();
-                        // String formattedDate =
-                        //     DateFormat('yyyy-MM-dd – kk:mm:ss').format(now);
-                  
-                        // Item.recommendation.add(Item(
-                        //   _titleController.text.trim(),
-                        //   widget.property_type,
-                        //   selectedLocation,
-                        //   double.parse(_priceController.text.trim()),
-                        //   imageUrl,
-                        //   _descriptionController.text.trim(),
-                        //   uid,
-                        //   formattedDate,
-                        //   false,
-                        //   imageUrls,
-                        // ));
-                  
-                        // Item newProperty = Item(
-                        //   _titleController.text.trim(),
-                        //   widget.property_type,
-                        //   selectedLocation,
-                        //   double.parse(_priceController.text.trim()),
-                        //   imageUrl,
-                        //   _descriptionController.text.trim(),
-                        //   uid,
-                        //   formattedDate,
-                        //   false,
-                        //   imageUrls,
-                        // );
-                  
-                        // Item.nearby.add(newProperty);
-                  
-                        // properties.update({
-                        //   newProperty.dateTime: {
-                        //     'title': newProperty.title,
-                        //     'type': newProperty.category,
-                        //     'location': newProperty.location,
-                        //     'price': newProperty.price,
-                        //     'imageUrl': newProperty.thumb_url,
-                        //     'description': newProperty.description,
-                        //     'uid': newProperty.tenantID,
-                        //     'favorite': false,
-                        //     'images': newProperty.images,
-                        //   }
-                        // });
-                  
-                  
+                        final title = _titleController.text;
+                        final description = _descriptionController.text;
+
+                        try {
+                          await _uploadFile(imageFile.path, true);
+                          await area.add({
+                            'title': title,
+                            'description': description,
+                            'thumbnail': imageUrl
+                          });
+
+                          Fluttertoast.showToast(
+                              msg: "Created area successfully",
+                              toastLength: Toast.LENGTH_LONG,
+                              gravity: ToastGravity.BOTTOM_RIGHT,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: kBGColor,
+                              textColor: kRevColor,
+                              fontSize: 16.0);
+                        } catch (e) {
+                          Fluttertoast.showToast(
+                              msg: "Failure to create area",
+                              toastLength: Toast.LENGTH_LONG,
+                              gravity: ToastGravity.BOTTOM_RIGHT,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.red,
+                              textColor: kRevColor,
+                              fontSize: 16.0);
+                          // If there is an error
+                        }
+
+                        _isDisabled = !_isDisabled;
                         if (mounted) {
                           widget.refresh();
                         }
-                  
+
                         Navigator.of(context).pop();
                       }),
                 ],
