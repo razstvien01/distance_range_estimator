@@ -42,12 +42,12 @@ float distanceInch;
 
 void setup_wifi() {
   // Connect to Wi-Fi
-  // Serial.println("Connecting to WiFi...");
-  // WiFi.begin(ssid, password);
-  // while (WiFi.status() != WL_CONNECTED) {
-  //   delay(500);
-  //   Serial.print(".");
-  // }
+  Serial.println("Connecting to WiFi...");
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
   pinMode(ledSendPin, OUTPUT);
   pinMode(ledConnectionPin, OUTPUT);
 
@@ -55,15 +55,15 @@ void setup_wifi() {
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
 
-  // Serial.println("WiFi connected");
-  // Serial.println("IP address: ");
-  // Serial.println(WiFi.localIP());
+  Serial.println("WiFi connected");
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
 }
 
 void setup() {
   Serial.begin(115200);
   setup_wifi();
-  // client.setServer(mqtt_broker, mqtt_port);
+  client.setServer(mqtt_broker, mqtt_port);
 }
 
 void loop() {
@@ -94,31 +94,31 @@ void loop() {
   delay(1000);
 
   digitalWrite(ledSendPin, HIGH);
-  // if (!client.connected()) {
-  //   while (!client.connected()) {
-  //     digitalWrite(ledConnectionPin, LOW);
-  //     Serial.print("Attempting MQTT connection...");
-  //     if (client.connect("ESP8266Client")) {
-  //       digitalWrite(ledConnectionPin, HIGH);
-  //       Serial.println("connected");
+  if (!client.connected()) {
+    while (!client.connected()) {
+      digitalWrite(ledConnectionPin, LOW);
+      Serial.print("Attempting MQTT connection...");
+      if (client.connect("ESP8266Client")) {
+        digitalWrite(ledConnectionPin, HIGH);
+        Serial.println("connected");
 
-  //       // distance = random(1, 400);
-  //       snprintf(msg, 50, "%ld", distance);
-  //       Serial.print("Publish message: ");
-  //       Serial.println(msg);
-  //       client.publish(topic, msg);
-  //       lastMsg = millis();
+        // distance = random(1, 400);
+        dtostrf(distanceCm, 1, 2, msg);
+        Serial.print("Publish message: ");
+        Serial.println(msg);
+        client.publish(topic, msg);
+        lastMsg = millis();
 
-  //     } else {
-  //       Serial.print("failed, rc=");
-  //       Serial.print(client.state());
-  //       Serial.println(" try again in 5 seconds");
-  //       delay(5000);
-  //     }
-  //   }
-  // }
+      } else {
+        Serial.print("failed, rc=");
+        Serial.print(client.state());
+        Serial.println(" try again in 5 seconds");
+        delay(5000);
+      }
+    }
+  }
 
-  // client.loop();
+  client.loop();
 
   // bool buttonState = digitalRead(buttonPin);
   // if (buttonState == HIGH && lastButtonState == LOW && client.connected()) {

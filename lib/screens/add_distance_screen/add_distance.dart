@@ -13,16 +13,22 @@ import 'package:path_provider/path_provider.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path/path.dart' as p;
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class AddDistanceScreen extends StatefulWidget {
-  const AddDistanceScreen({super.key});
+  final String distance;
+
+  const AddDistanceScreen({super.key, required this.distance});
 
   @override
   State<AddDistanceScreen> createState() => _AddDistanceScreenState();
 }
 
 class _AddDistanceScreenState extends State<AddDistanceScreen> {
-  final _labelController = TextEditingController();
+  final CollectionReference measurements =
+      FirebaseFirestore.instance.collection('measurements');
 
+  final _labelController = TextEditingController();
   final _saveToController = TextEditingController();
 
   // final List<String> imageUrls = List.generate(
@@ -198,15 +204,15 @@ class _AddDistanceScreenState extends State<AddDistanceScreen> {
                 child: Padding(
                   padding: EdgeInsets.only(top: kDefaultPadding),
                   child: Text(
-                    "Captured Distance 10 cm",
+                    "Captured Distance",
                     style: kSubTextStyle,
                   ),
                 ),
               ),
-              const Flexible(
+              Flexible(
                 flex: 1,
                 child: Text(
-                  "10 CM",
+                  "${widget.distance} CM",
                   style: kHeadTextStyle,
                 ),
               ),
@@ -248,8 +254,8 @@ class _AddDistanceScreenState extends State<AddDistanceScreen> {
               // ),
               (_imageList.isNotEmpty)
                   ? Flexible(
-                    flex: 4,
-                    child: SizedBox(
+                      flex: 4,
+                      child: SizedBox(
                         // height: 180,
                         child: GridView.builder(
                           gridDelegate:
@@ -287,7 +293,7 @@ class _AddDistanceScreenState extends State<AddDistanceScreen> {
                           },
                         ),
                       ),
-                  )
+                    )
                   : const SizedBox(
                       height: kDefaultPadding,
                     ),
@@ -300,8 +306,37 @@ class _AddDistanceScreenState extends State<AddDistanceScreen> {
               ),
               DefaultButton(
                 btnText: "Save Distance",
-                onPressed: () =>
-                    {Navigator.of(context).popUntil((route) => route.isFirst)},
+                onPressed: () async {
+                  try {
+                    QuerySnapshot querySnapshot = await measurements
+                        .where('title', isEqualTo: _saveToController.text)
+                        .get();
+
+                    if (querySnapshot.docs.isNotEmpty) {
+                      // A document with name="table" exists in the collection
+                      // You can access it using querySnapshot.docs[0] or iterate through the results if needed
+                      DocumentSnapshot documentSnapshot = querySnapshot.docs[0];
+
+                      // Cast data to the expected type (Map<String, dynamic>)
+                      final data =
+                          documentSnapshot.data() as Map<String, dynamic>;
+
+                      // Now you can access fields using the '[]' operator
+                      final title = data['title'];
+                      print(data);
+                      print('Document ID: ${documentSnapshot.id}');
+                      print('Name: ${title}');
+                      // Access other fields as needed
+                    } else {
+                      // No document with name="table" found
+                      print('No document found with ${_saveToController.text}');
+                    }
+                  } catch (e) {
+                    print('Error: $e');
+                  }
+
+                  // Navigator.of(context).popUntil((route) => route.isFirst);
+                },
               ),
             ],
           ),

@@ -1,3 +1,4 @@
+import 'package:distance_range_estimator/screens/add_distance_screen/add_distance.dart';
 import 'package:distance_range_estimator/types/constants.dart';
 import 'package:distance_range_estimator/widgets/area_list.dart';
 import 'package:distance_range_estimator/widgets/default_button.dart';
@@ -12,10 +13,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  
   @override
   Widget build(BuildContext context) {
-    
     return Column(
       children: [
         Flexible(
@@ -33,9 +32,18 @@ class _HomeScreenState extends State<HomeScreen> {
         Flexible(
           flex: 1,
           child: DefaultButton(
-              btnText: "Save",
-              onPressed: () =>
-                  {Navigator.of(context).pushNamed('/add_distance')}),
+              btnText: "Save Distance",
+              onPressed: () => {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return AddDistanceScreen(
+                            distance: widget.message,
+                          );
+                        },
+                      ),
+                    )
+                  }),
         ),
         Flexible(flex: 5, child: AreaList()),
         Flexible(

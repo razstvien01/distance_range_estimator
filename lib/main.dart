@@ -40,7 +40,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       routes: {
         '/add_area': (context) => CreateAreaScreen(refresh: () => {}),
-        '/add_distance': (context) => AddDistanceScreen()
+        
       },
       title: 'Flutter MQTT Demo',
       debugShowCheckedModeBanner: false,
@@ -85,7 +85,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void connect() async {
     client.setProtocolV311();
     client.logging(on: true);
-    client.keepAlivePeriod = 5;
+    client.keepAlivePeriod = 60;
     client.onDisconnected = onDisconnected;
     client.onConnected = onConnected;
     client.onSubscribed = onSubscribed;
