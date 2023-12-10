@@ -1,11 +1,13 @@
 import 'dart:io';
 
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
 import 'package:distance_range_estimator/types/constants.dart';
 import 'package:distance_range_estimator/widgets/default_button.dart';
 import 'package:distance_range_estimator/widgets/default_textfield.dart';
 import 'package:distance_range_estimator/widgets/image_list.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -27,13 +29,11 @@ class AddDistanceScreen extends StatefulWidget {
 class _AddDistanceScreenState extends State<AddDistanceScreen> {
   final CollectionReference measurements =
       FirebaseFirestore.instance.collection('measurements');
+  final CollectionReference distances =
+      FirebaseFirestore.instance.collection('distances');
 
   final _labelController = TextEditingController();
   final _saveToController = TextEditingController();
-
-  // final List<String> imageUrls = List.generate(
-  //     10, (index) => 'https://picsum.photos/250?image=${index + 10}');
-
   final ImagePicker _picker = ImagePicker();
   final List<File> _imageList = [];
 
@@ -42,17 +42,17 @@ class _AddDistanceScreenState extends State<AddDistanceScreen> {
   late File imageFile = File('');
 
   Future _uploadFile(String path) async {
-    // final ref = FirebaseStorage.instance
-    //     .ref()
-    //     .child('properties')
-    //     .child(DateTime.now().toIso8601String() + p.basename(path));
+    final ref = FirebaseStorage.instance
+        .ref()
+        .child('properties')
+        .child(DateTime.now().toIso8601String() + p.basename(path));
 
-    // final result = await ref.putFile(File(path));
-    // final fileUrl = await result.ref.getDownloadURL();
+    final result = await ref.putFile(File(path));
+    final fileUrl = await result.ref.getDownloadURL();
 
     setState(() {
-      // imageUrls.add(fileUrl);
-      imageUrls.add(path);
+      imageUrls.add(fileUrl);
+      // imageUrls.add(path);
     });
   }
 
@@ -313,23 +313,57 @@ class _AddDistanceScreenState extends State<AddDistanceScreen> {
                         .get();
 
                     if (querySnapshot.docs.isNotEmpty) {
-                      // A document with name="table" exists in the collection
-                      // You can access it using querySnapshot.docs[0] or iterate through the results if needed
                       DocumentSnapshot documentSnapshot = querySnapshot.docs[0];
 
                       // Cast data to the expected type (Map<String, dynamic>)
-                      final data =
-                          documentSnapshot.data() as Map<String, dynamic>;
+                      // final data =
+                      //     documentSnapshot.data() as Map<String, dynamic>;
 
-                      // Now you can access fields using the '[]' operator
-                      final title = data['title'];
-                      print(data);
-                      print('Document ID: ${documentSnapshot.id}');
-                      print('Name: ${title}');
-                      // Access other fields as needed
+                      try {
+                        for (File f in _imageList) {
+                          await _uploadFile(f.path);
+                        }
+
+                        await distances.add({
+                          'label': _labelController.text,
+                          'saveTo': _saveToController.text,
+                          'saveToId': documentSnapshot.id,
+                          'imageUrls': imageUrls,
+                        });
+
+                        Fluttertoast.showToast(
+                            msg:
+                                "Captured distance saved to ${_saveToController.text} measurements.",
+                            toastLength: Toast.LENGTH_LONG,
+                            gravity: ToastGravity.BOTTOM_RIGHT,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: kBGColor,
+                            textColor: kRevColor,
+                            fontSize: 16.0);
+
+                        Navigator.of(context)
+                            .popUntil((route) => route.isFirst);
+                      } catch (e) {
+                        Fluttertoast.showToast(
+                            msg:
+                                "Failure to savw the distance in the ${_saveToController.text} measurements",
+                            toastLength: Toast.LENGTH_LONG,
+                            gravity: ToastGravity.BOTTOM_RIGHT,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.red,
+                            textColor: kRevColor,
+                            fontSize: 16.0);
+                      }
                     } else {
-                      // No document with name="table" found
-                      print('No document found with ${_saveToController.text}');
+                      Fluttertoast.showToast(
+                          msg:
+                              "No document found with ${_saveToController.text} measurements",
+                          toastLength: Toast.LENGTH_LONG,
+                          gravity: ToastGravity.BOTTOM_RIGHT,
+                          timeInSecForIosWeb: 1,
+                          backgroundColor: Colors.red,
+                          textColor: kRevColor,
+                          fontSize: 16.0);
                     }
                   } catch (e) {
                     print('Error: $e');
