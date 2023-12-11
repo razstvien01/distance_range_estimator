@@ -325,10 +325,12 @@ class _AddDistanceScreenState extends State<AddDistanceScreen> {
                         }
 
                         await distances.add({
+                          'distance': widget.distance,
                           'label': _labelController.text,
                           'saveTo': _saveToController.text,
                           'saveToId': documentSnapshot.id,
                           'imageUrls': imageUrls,
+                          'created_at': Timestamp.now(),
                         });
 
                         Fluttertoast.showToast(
