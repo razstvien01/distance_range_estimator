@@ -1,5 +1,6 @@
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
+#include <LiquidCrystal.h>
 
 // Network credentials
 const char* ssid = "HG8145V5_0484D";
@@ -27,33 +28,28 @@ long distance;
 int duration;
 char msg[50];
 
-
-
 // Pins
 // const int buttonPin = D2;  // Change D3 to your ESP8266 GPIO pin connected to the button
 bool lastButtonState = LOW;
-int ledSendPin = D1;
-int ledConnectionPin = D5;
-const int trigPin = D6;
-const int echoPin = D7;
+int ledConnectionPin = D0;
+const int trigPin = D1;
+const int echoPin = D2;
 
 float distanceCm;
 float distanceInch;
+
+// LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+LiquidCrystal lcd(D3, D4, D5, D6, D7, D8);
+const char* textToScroll = "Manifesting makapasar! HELP USS!!!!";
 
 void setup_wifi() {
   // Connect to Wi-Fi
   Serial.println("Connecting to WiFi...");
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
+    delay(200);
     Serial.print(".");
   }
-  pinMode(ledSendPin, OUTPUT);
-  pinMode(ledConnectionPin, OUTPUT);
-
-
-  pinMode(trigPin, OUTPUT);
-  pinMode(echoPin, INPUT);
 
   Serial.println("WiFi connected");
   Serial.println("IP address: ");
@@ -61,6 +57,15 @@ void setup_wifi() {
 }
 
 void setup() {
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  
+  // lcd.begin(16, 2);
+  // lcd.clear();
+  // lcd.print(textToScroll);
+  
+  pinMode(ledConnectionPin, OUTPUT);
+
   Serial.begin(115200);
   setup_wifi();
   client.setServer(mqtt_broker, mqtt_port);
@@ -88,12 +93,9 @@ void loop() {
   // Prints the distance on the Serial Monitor
   Serial.print("Distance (cm): ");
   Serial.println(distanceCm);
-  Serial.print("Distance (inch): ");
-  Serial.println(distanceInch);
 
   delay(1000);
 
-  digitalWrite(ledSendPin, HIGH);
   if (!client.connected()) {
     while (!client.connected()) {
       digitalWrite(ledConnectionPin, LOW);
@@ -112,13 +114,26 @@ void loop() {
       } else {
         Serial.print("failed, rc=");
         Serial.print(client.state());
-        Serial.println(" try again in 5 seconds");
-        delay(5000);
+        Serial.println(" try again in 3 seconds");
+        delay(3000);
       }
     }
   }
 
   client.loop();
+
+  // int textLength = strlen(textToScroll);
+
+  // for (int i = 0; i < textLength + 16; ++i) {
+  //   lcd.scrollDisplayLeft();
+  //   delay(300);
+  // }
+
+  // lcd.setCursor(textLength > 16 ? 16 : textLength, 1);
+  // delay(1000);
+  // lcd.clear();
+  // lcd.setCursor(0, 0);
+  // lcd.print(textToScroll);
 
   // bool buttonState = digitalRead(buttonPin);
   // if (buttonState == HIGH && lastButtonState == LOW && client.connected()) {
@@ -137,3 +152,29 @@ void loop() {
   // }
   // lastButtonState = buttonState;  // Update the last button state
 }
+
+// #include <LiquidCrystal.h>
+
+// // Define the LCD control pins
+// const int rs = D3;  // RS pin
+// const int en = D4;  // Enable pin
+// const int d4 = D5;
+// const int d5 = D6;
+// const int d6 = D7;
+// const int d7 = D8;
+
+// // Create an instance of the LiquidCrystal library
+// LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+
+// void setup() {
+//   // Initialize the LCD
+//   lcd.begin(16, 2); // Change the numbers to match your LCD's dimensions (columns x rows)
+
+//   // Print a message to the LCD
+//   lcd.print("Hello, ESP8266!");
+// }
+
+// void loop() {
+//   // Your main code here
+// }
+

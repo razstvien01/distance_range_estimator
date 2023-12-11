@@ -23,7 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: EdgeInsets.only(top: 20.0),
             child: Column(
               children: [
-                Text("Current Distance:", style: kSubTextStyle),
+                const Text("Current Distance:", style: kSubTextStyle),
                 Text("${widget.message} cm", style: kHeadTextStyle),
               ],
             ),

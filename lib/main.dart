@@ -40,7 +40,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       routes: {
         '/add_area': (context) => CreateAreaScreen(refresh: () => {}),
-        
       },
       title: 'Flutter MQTT Demo',
       debugShowCheckedModeBanner: false,
@@ -83,6 +82,9 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void connect() async {
+    const Duration retryDelay =
+        Duration(seconds: 5); // Delay between reconnection attempts
+
     client.setProtocolV311();
     client.logging(on: true);
     client.keepAlivePeriod = 60;
@@ -90,18 +92,24 @@ class _MyHomePageState extends State<MyHomePage> {
     client.onConnected = onConnected;
     client.onSubscribed = onSubscribed;
 
-    try {
-      await client.connect();
-    } catch (e) {
-      client.disconnect();
-    }
+    while (true) {
+      // Infinite loop for reconnection attempts
+      try {
+        await client.connect();
+        if (client.connectionStatus?.state ==
+            mqtt.MqttConnectionState.connected) {
+          print('MQTT client connected');
+          return; // Exit the loop on successful connection
+        } else {
+          print(
+              'Connection attempt failed, status is ${client.connectionStatus}');
+        }
+      } catch (e) {
+        print(
+            'Connection attempt failed - trying again in ${retryDelay.inSeconds} seconds');
+      }
 
-    if (client.connectionStatus?.state == mqtt.MqttConnectionState.connected) {
-      print('MQTT client connected');
-    } else {
-      print(
-          'ERROR MQTT client connection failed - disconnecting, status is ${client.connectionStatus}');
-      client.disconnect();
+      await Future.delayed(retryDelay); // Wait before retrying
     }
   }
 
