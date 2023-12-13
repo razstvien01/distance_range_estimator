@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'dart:convert';
+import 'package:distance_range_estimator/widgets/measurement_dialog.dart';
 import 'package:typed_data/typed_buffers.dart';
 
 import 'package:distance_range_estimator/screens/add_area_screen/add_area.dart';
@@ -60,6 +61,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  String selectedMeasurement = "cm";
   final _ssidController = TextEditingController();
   final _passwordController = TextEditingController();
 
@@ -73,7 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final mqtt.MqttServerClient client =
       mqtt.MqttServerClient('broker.hivemq.com', '');
-  String receivedMessage = 'Waiting for messages...';
+  String receivedMessage = '0.00';
 
   @override
   void initState() {
@@ -138,76 +140,19 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  Future openDialog() => showDialog(
+  void updateMeasurementUnit(String unit) {
+    setState(() {
+      selectedMeasurement = unit;
+    });
+  }
+
+  void _showMeasurementDialog() async {
+    selectedMeasurement = await showDialog<String>(
       context: context,
-      builder: (context) => AlertDialog(
-            backgroundColor: kPrimaryColor,
-            title: const Text(
-              'Connect the embedded device to the SSID',
-              style: kSubTextStyle,
-            ),
-            content: SizedBox(
-              height: 140.0,
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: DefaultTextField(
-                      hintText: "Enter SSID",
-                      icon: Icons.ssid_chart,
-                      controller: _ssidController,
-                      keyboardType: TextInputType.text,
-                      validator: (value) {
-                        return null;
-                      },
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: DefaultTextField(
-                      hintText: "Enter Password",
-                      icon: Icons.password,
-                      controller: _passwordController,
-                      keyboardType: TextInputType.visiblePassword,
-                      validator: (value) {
-                        return null;
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            actions: [
-              DefaultButton(
-                  btnText: "Submit",
-                  onPressed: () {
-                    publishSSIDAndPassword(
-                        _ssidController.text, _passwordController.text);
-                    // Navigator.of(context).pop();
-                  }),
-            ],
-          ));
-
-  void publishSSIDAndPassword(String ssid, String password) {
-    final String topic = "esp8266/config"; // The topic to publish to
-    final String message =
-        'SSID:$ssid;PASSWORD:$password'; // Or use JSON format
-
-    if (client.connectionStatus?.state == mqtt.MqttConnectionState.connected) {
-      final Uint8List data = Uint8List.fromList(utf8.encode(message));
-
-      final Uint8Buffer buffer = Uint8Buffer();
-      buffer.addAll(data);
-
-      client.publishMessage(
-        topic,
-        mqtt.MqttQos.atLeastOnce,
-        buffer,
-      );
-      print('Message published: $message to topic: $topic');
-    } else {
-      print('MQTT Client is not connected. Cannot send message.');
-    }
+      builder: (BuildContext context) {
+        return MeasurementDialog(updateMeasurementUnit, selectedMeasurement);
+      },
+    ) as String;
   }
 
   @override
@@ -225,18 +170,21 @@ class _MyHomePageState extends State<MyHomePage> {
                 //   context,
                 //   MaterialPageRoute(builder: (context) => const NotificationUI()),
                 // );
-                openDialog();
+                // openDialog();
 
+                _showMeasurementDialog();
                 _ssidController.text = "";
                 _passwordController.text = "";
               },
               icon: const Icon(
-                Icons.wifi_find,
+                Icons.settings,
                 color: kRevColor,
               ),
             )
           ],
         ),
-        body: HomeScreen(message: receivedMessage));
+        body: HomeScreen(
+            message: receivedMessage,
+            selectedMeasurement: selectedMeasurement));
   }
 }

@@ -6,13 +6,15 @@ import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
   final String message; // Remove the const keyword
-  HomeScreen({super.key, required this.message});
+  final String selectedMeasurement;
+  HomeScreen({super.key, required this.message, required this.selectedMeasurement});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -24,7 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               children: [
                 const Text("Current Distance:", style: kSubTextStyle),
-                Text("${widget.message} cm", style: kHeadTextStyle),
+                Text("${widget.message} ${widget.selectedMeasurement}", style: kHeadTextStyle),
               ],
             ),
           ),
