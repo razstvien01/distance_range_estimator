@@ -7,7 +7,8 @@ import 'package:flutter/material.dart';
 class HomeScreen extends StatefulWidget {
   final String message; // Remove the const keyword
   final String selectedMeasurement;
-  HomeScreen({super.key, required this.message, required this.selectedMeasurement});
+  final String status;
+  HomeScreen({super.key, required this.message, required this.selectedMeasurement, required this.status});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -19,6 +20,18 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        Flexible(
+          flex: 1,
+          child: Padding(
+            padding: EdgeInsets.only(top: 20.0),
+            child: Column(
+              children: [
+                const Text("Status:", style: kSubTextStyle),
+                Text(widget.status, style: kHeadTextStyle),
+              ],
+            ),
+          ),
+        ),
         Flexible(
           flex: 1,
           child: Padding(
@@ -47,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     )
                   }),
         ),
-        Flexible(flex: 5, child: AreaList()),
+        Flexible(flex: 4, child: AreaList()),
         Flexible(
           flex: 1,
           child: DefaultButton(

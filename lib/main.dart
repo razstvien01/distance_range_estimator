@@ -61,10 +61,9 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> 
-{
-  
+class _MyHomePageState extends State<MyHomePage> {
   String selectedMeasurement = "cm";
+  String status = "Not connected";
   final _ssidController = TextEditingController();
   final _passwordController = TextEditingController();
 
@@ -104,8 +103,15 @@ class _MyHomePageState extends State<MyHomePage>
         if (client.connectionStatus?.state ==
             mqtt.MqttConnectionState.connected) {
           print('MQTT client connected');
+
+          setState(() {
+            status = "Connected";
+          });
           return; // Exit the loop on successful connection
         } else {
+          setState(() {
+            status = "Not connected";
+          });
           print(
               'Connection attempt failed, status is ${client.connectionStatus}');
         }
@@ -120,6 +126,7 @@ class _MyHomePageState extends State<MyHomePage>
 
   void onConnected() {
     print('Connected');
+
     client.subscribe("distance_range_estimator", mqtt.MqttQos.atMostOnce);
   }
 
@@ -164,8 +171,8 @@ class _MyHomePageState extends State<MyHomePage>
       mqttMessage.addString(selectedMeasurement);
 
       // Publish the message to a specific MQTT topic
-      client.publishMessage(
-          'distance_range_estimator', MqttQos.atLeastOnce, mqttMessage.payload as Uint8Buffer);
+      client.publishMessage('distance_range_estimator', MqttQos.atLeastOnce,
+          mqttMessage.payload as Uint8Buffer);
 
       // Update the selected measurement state (optional)
       // setState(() {
@@ -203,6 +210,7 @@ class _MyHomePageState extends State<MyHomePage>
           ],
         ),
         body: HomeScreen(
+            status: status,
             message: receivedMessage,
             selectedMeasurement: selectedMeasurement));
   }
