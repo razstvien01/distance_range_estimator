@@ -9,16 +9,6 @@ class DetailScreen extends StatelessWidget {
   final String areaName;
   final String saveToId;
 
-  // Sample data: List of measurements with labels.
-  final List<Map<String, dynamic>> measurements = List.generate(
-    10,
-    (index) => {
-      'label': 'Measurement ${index + 1}',
-      'distance': '${10 + index * 5} cm',
-      'imageUrl': 'https://picsum.photos/200/300?random=$index',
-    },
-  );
-
   DetailScreen({super.key, required this.areaName, required this.saveToId});
 
   @override
@@ -72,91 +62,109 @@ class DetailScreen extends StatelessWidget {
 
                 // print(distances);
                 // return Text('HGELLO WORL.D', style: kSubTextStyle,);
-                return Card(
-                  color: kBGColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15.0),
-                  ),
-                  elevation: 5, // Adjust the elevation for shadow intensity
-                  child: Column(
-                    children: [
-                      ClipRRect(
-                        // Clip the image with rounded corners
-                        borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(kBigPadding)),
-                        child: Image.network(
-                          thumbUrl,
-                          height: 350,
-                          width: 350,
-                          fit: BoxFit.fill,
-                        ),
+                return Stack(
+                  children: [
+                    Card(
+                      color: kBGColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15.0),
                       ),
-                      InkWell(
-                        // InkWell for ListTile with rounded corners
-                        borderRadius: const BorderRadius.vertical(
-                            bottom: Radius.circular(kDefaultPadding)),
-                        child: ListTile(
-                          tileColor: Colors.transparent,
-                          title: Text(
-                            distance + " cm",
-                            style: kSubTextStyle,
+                      elevation: 5, // Adjust the elevation for shadow intensity
+                      child: Column(
+                        children: [
+                          ClipRRect(
+                            // Clip the image with rounded corners
+                            borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(kBigPadding),
+                            ),
+                            child: Image.network(
+                              thumbUrl,
+                              height: 350,
+                              width: 350,
+                              fit: BoxFit.fill,
+                            ),
                           ),
-                          subtitle: Text(
-                            label,
-                            style: kSmallTextStyle,
+                          InkWell(
+                            // InkWell for ListTile with rounded corners
+                            borderRadius: const BorderRadius.vertical(
+                              bottom: Radius.circular(kDefaultPadding),
+                            ),
+                            child: ListTile(
+                              tileColor: Colors.transparent,
+                              title: Text(
+                                distance + " cm",
+                                style: kSubTextStyle,
+                              ),
+                              subtitle: Text(
+                                label,
+                                style: kSmallTextStyle,
+                              ),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                    Positioned(
+                      top: 10, // Adjust the top position as needed
+                      right: 10, // Adjust the right position as needed
+                      child: IconButton(
+                        color: Colors.redAccent,
+                        icon: Icon(Icons.delete),
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                backgroundColor: kBGColor,
+                                title: const Text('Confirm Deletion', style: kHeadTextStyle,),
+                                content: const Text(
+                                    'Are you sure you want to delete this distance?', style: kSubTextStyle,),
+                                actions: <Widget>[
+                                  TextButton(
+                                    child: const Text('Cancel'),
+                                    onPressed: () {
+                                      Navigator.of(context)
+                                          .pop(); // Close the dialog
+                                    },
+                                  ),
+                                  TextButton(
+                                    child: const Text('Delete'),
+                                    onPressed: () {
+                                      final CollectionReference distances =
+                                          FirebaseFirestore.instance
+                                              .collection('distances');
+
+                                      // Use the documentId variable to get the document reference
+                                      DocumentReference docRef =
+                                          distances.doc(documentId);
+
+                                      // Delete the document
+                                      docRef.delete().then((_) {
+                                        // Document deleted successfully
+                                        print('Document deleted');
+                                        Navigator.of(context)
+                                            .pop(); // Close the dialog
+                                      }).catchError((error) {
+                                        // Handle errors, if any
+                                        print(
+                                            'Error deleting document: $error');
+                                      });
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    )
+                  ],
                 );
               },
             );
 
             // return Text('Hello wlrld', style: kSubTextStyle,);
           },
-        )
-
-        // body: ListView.builder(
-        //   itemCount: measurements.length,
-        //   itemBuilder: (context, index) {
-        //     return Card(
-        //       color: kBGColor,
-        //       shape: RoundedRectangleBorder(
-        //         borderRadius: BorderRadius.circular(15.0),
-        //       ),
-        //       elevation: 5, // Adjust the elevation for shadow intensity
-        //       child: Column(
-        //         children: [
-        //           ClipRRect(
-        //             // Clip the image with rounded corners
-        //             borderRadius: const BorderRadius.vertical(
-        //                 top: Radius.circular(kBigPadding)),
-        //             child: Image.network(measurements[index]['imageUrl'],
-        //                 height: 200, fit: BoxFit.fill),
-        //           ),
-        //           InkWell(
-        //             // InkWell for ListTile with rounded corners
-        //             borderRadius: const BorderRadius.vertical(
-        //                 bottom: Radius.circular(kDefaultPadding)),
-        //             child: ListTile(
-        //               tileColor: Colors.transparent,
-        //               title: Text(
-        //                 measurements[index]['label'],
-        //                 style: kSubTextStyle,
-        //               ),
-        //               subtitle: Text(
-        //                   'Distance: ${measurements[index]['distance']}',
-        //                   style: kSmallTextStyle),
-        //             ),
-        //           ),
-        //         ],
-        //       ),
-        //     );
-
-        //   },
-        // ),
-
-        );
+        ));
   }
 }
