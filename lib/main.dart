@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'dart:convert';
 import 'package:distance_range_estimator/widgets/measurement_dialog.dart';
+import 'package:mqtt_client/mqtt_client.dart';
 import 'package:typed_data/typed_buffers.dart';
 
 import 'package:distance_range_estimator/screens/add_area_screen/add_area.dart';
@@ -60,7 +61,9 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> 
+{
+  
   String selectedMeasurement = "cm";
   final _ssidController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -153,6 +156,22 @@ class _MyHomePageState extends State<MyHomePage> {
         return MeasurementDialog(updateMeasurementUnit, selectedMeasurement);
       },
     ) as String;
+
+    // Check if a measurement unit was selected
+    if (selectedMeasurement != null) {
+      // Publish the selected measurement unit to your ESP8266 using MQTT
+      final mqttMessage = MqttClientPayloadBuilder();
+      mqttMessage.addString(selectedMeasurement);
+
+      // Publish the message to a specific MQTT topic
+      client.publishMessage(
+          'distance_range_estimator', MqttQos.atLeastOnce, mqttMessage.payload as Uint8Buffer);
+
+      // Update the selected measurement state (optional)
+      // setState(() {
+      //   this.selectedMeasurement = selectedMeasurement;
+      // });
+    }
   }
 
   @override
