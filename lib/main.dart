@@ -1,15 +1,11 @@
-import 'dart:typed_data';
-import 'dart:convert';
+
 import 'package:distance_range_estimator/widgets/measurement_dialog.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:typed_data/typed_buffers.dart';
 
 import 'package:distance_range_estimator/screens/add_area_screen/add_area.dart';
-import 'package:distance_range_estimator/screens/add_distance_screen/add_distance.dart';
 import 'package:distance_range_estimator/screens/home_screen/home.dart';
 import 'package:distance_range_estimator/types/constants.dart';
-import 'package:distance_range_estimator/widgets/default_button.dart';
-import 'package:distance_range_estimator/widgets/default_textfield.dart';
 import 'package:flutter/material.dart';
 
 //* MQTT Libraries
@@ -145,6 +141,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
       print('Received message: $payload from topic: ${c[0].topic}>');
       setState(() {
+        print(payload);
         receivedMessage = payload;
       });
     });
@@ -165,20 +162,20 @@ class _MyHomePageState extends State<MyHomePage> {
     ) as String;
 
     // Check if a measurement unit was selected
-    if (selectedMeasurement != null) {
-      // Publish the selected measurement unit to your ESP8266 using MQTT
-      final mqttMessage = MqttClientPayloadBuilder();
-      mqttMessage.addString(selectedMeasurement);
+    // if (selectedMeasurement != null) {
+    //   // Publish the selected measurement unit to your ESP8266 using MQTT
+    //   final mqttMessage = MqttClientPayloadBuilder();
+    //   mqttMessage.addString(selectedMeasurement);
 
-      // Publish the message to a specific MQTT topic
-      client.publishMessage('distance_range_estimator', MqttQos.atLeastOnce,
-          mqttMessage.payload as Uint8Buffer);
+    //   // Publish the message to a specific MQTT topic
+    //   client.publishMessage('distance_range_estimator', MqttQos.atLeastOnce,
+    //       mqttMessage.payload as Uint8Buffer);
 
-      // Update the selected measurement state (optional)
-      // setState(() {
-      //   this.selectedMeasurement = selectedMeasurement;
-      // });
-    }
+    //   // Update the selected measurement state (optional)
+    //   // setState(() {
+    //   //   this.selectedMeasurement = selectedMeasurement;
+    //   // });
+    // }
   }
 
   @override

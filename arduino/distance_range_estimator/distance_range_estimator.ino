@@ -5,11 +5,12 @@
 // Network credentials
 // const char* ssid = "HG8145V5_0484D";
 // const char* password = "PZz6VKmu";
-const char* ssid = "Nico";
-const char* password = "00000000";
 
-// const char* ssid = "Narzo50";
-// const char* password = "123456789";
+// const char* ssid = "Nico";
+// const char* password = "00000000";
+
+const char* ssid = "Narzo50";
+const char* password = "123456789";
 
 // MQTT Broker
 const char* mqtt_broker = "broker.hivemq.com";
@@ -32,7 +33,7 @@ char msg[50];
 // const int buttonPin = D2;  // Change D3 to your ESP8266 GPIO pin connected to the button
 // int ledConnectionPin = D0;
 
-int distanceCm;
+float distanceCm;
 float distanceInch;
 float distanceFt;
 
@@ -43,7 +44,7 @@ const int d4 = D8;
 const int d5 = D7;
 const int d6 = D6;
 const int d7 = D5;
-const int trigPin = D4;  //left
+const int trigPin = D4;  //left, orange
 const int echoPin = D2;  //right
 
 const int buttonPin = D3;
@@ -59,6 +60,7 @@ const int numberOfStates = 3;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
 void setup_wifi() {
+
   // Connect to Wi-Fi
   Serial.println("Connecting to WiFi...");
   WiFi.begin(ssid, password);
@@ -73,24 +75,23 @@ void setup_wifi() {
 }
 
 void setup() {
-  // setup_wifi();
+  Serial.begin(115200);
+  lcd.begin(16, 2);  // Set the dimensions of the LCD (16x2)
+  lcd.println("CONNECTING...");
+  setup_wifi();
 
-  // client.setServer(mqtt_broker, mqtt_port);
+  client.setServer(mqtt_broker, mqtt_port);
 
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
 
   pinMode(buttonPin, INPUT);
 
-  // pinMode(ledConnectionPin, OUTPUT);
-
-  lcd.begin(16, 2);  // Set the dimensions of the LCD (16x2)
-
-  Serial.begin(9600);
-  // setup_wifi();
+  lcd.clear();
 }
 
 void loop() {
+  String result = "";
   // Clears the trigPin
   digitalWrite(trigPin, LOW);
   delayMicroseconds(2);
@@ -112,8 +113,8 @@ void loop() {
   distanceInch = distanceCm / 2.54;  // 1 inch = 2.54 cm
 
   buttonState = digitalRead(buttonPin);
-  // Serial.println("HELLO WORLD");
 
+  Serial.println("HELLO");
   // If the button is pressed and the previous state was not pressed
   if (buttonState == HIGH && lastButtonState == LOW) {
     // Toggle the LED state
@@ -127,51 +128,67 @@ void loop() {
 
 
   switch (currentState) {
-    
-    case 0:  
-      lcd.print(distanceCm);
-      lcd.println(" cm");
+
+    case 0:
+      result = String(distanceCm) + " cm";
+      lcd.println(result);
       break;
-    case 1:  
-      lcd.print(distanceInch);
-      lcd.println(" inches");
+    case 1:
+      result = String(distanceInch) + " inches";
+      lcd.println(result);
       break;
     case 2:
-      lcd.print(distanceFt);
-      lcd.println(" ft");
+      result = String(distanceFt) + " ft";
+      lcd.println(result);
       break;
   }
-  
-  
-  delay(200);
-  lcd.clear();
+
   // delay(1000);
 
-  // if (!client.connected()) {
-  //   while (!client.connected()) {
-  //     // digitalWrite(ledConnectionPin, LOW);
-  //     Serial.print("Attempting MQTT connection...");
-  //     if (client.connect("ESP8266Client")) {
-  //       // digitalWrite(ledConnectionPin, HIGH);
-  //       Serial.println("connected");
+  if (!client.connected()) {
+    while (!client.connected()) {
+      // digitalWrite(ledConnectionPin, LOW);
+      Serial.print("Attempting MQTT connection...");
 
-  //       // distance = random(1, 400);
-  //       dtostrf(distanceCm, 1, 2, msg);
-  //       Serial.print("Publish message: ");
-  //       Serial.println(msg);
-  //       client.publish(topic, msg);
-  //       lastMsg = millis();
+      if (client.connect("ESP8266Client")) {
+        // digitalWrite(ledConnectionPin, HIGH);
+        Serial.println("connected");
 
-  //     } else {
-  //       Serial.print("failed, rc=");
-  //       Serial.print(client.state());
-  //       Serial.println(" try again in 2 seconds");
-  //       delay(2000);
-  //     }
-  //   }
-  // }
+        float dVal = 0;
 
-  // client.loop();
+        switch (currentState) {
+
+          case 0:
+            dVal = distanceCm;
+            break;
+          case 1:
+            dVal = distanceInch;
+            break;
+          case 2:
+            dVal = distanceFt;
+            break;
+        }
+
+
+        dtostrf(dVal, 1, 2, msg);
+        Serial.print("Publish message: ");
+        Serial.println(msg);
+        client.publish(topic, msg);
+        lastMsg = millis();
+
+      } else {
+        Serial.print("failed, rc=");
+        Serial.print(client.state());
+        Serial.println(" try again in 2 seconds");
+        delay(2000);
+      }
+    }
+  }
+
+  client.loop();
+
+  delay(200);
+  lcd.clear();
 }
 
 // const int buttonPin = D3;  // Change this if your button is connected to a different pin
@@ -198,4 +215,83 @@ void loop() {
 
 //   // Save the current button state for the next loop iteration
 //   lastButtonState = buttonState;
+// }
+
+
+
+// #include <LiquidCrystal.h>
+
+// Pin mapping to the LCD
+// const int rs = D1;
+// const int en = D0;
+// const int d4 = D8;
+// const int d5 = D7;
+// const int d6 = D6;
+// const int d7 = D5;
+// const int trigPin=D4; //left
+// const int echoPin=D2; //right
+
+// int duration;
+// int distance;
+
+// LiquidCrystal lcd(rs, en, d4, d5, d6, d7); // Initialize the LCD
+
+// void setup() {
+
+//   pinMode(trigPin, OUTPUT);
+//   pinMode(echoPin, INPUT);
+
+//   lcd.begin(16, 2); // Set the dimensions of the LCD (16x2)
+//   lcd.print(distance);
+//   delay(1000);
+//   Serial.begin(9600);
+
+// }
+
+// void loop() {
+//   // You can add your main code logic here if needed
+//   digitalWrite(trigPin, LOW);
+//   delayMicroseconds(2);
+
+//   digitalWrite(trigPin, HIGH);
+//   delayMicroseconds(10);
+//   digitalWrite(trigPin, LOW);
+
+//   duration = pulseIn(echoPin, HIGH);
+//   distance = duration/29/2;
+
+//   Serial.print("Distance: ");
+//   Serial.println(distance);
+
+//   lcd.clear();
+//   lcd.print(distance);
+//   lcd.print(" CM");
+
+//   delay(2000);
+
+
+
+// }
+
+// void setup() {
+//   delay(10000);
+//   Serial.begin(115200);
+//   Serial.println("Start");
+//   Serial.println("---------------");
+//   delay(1000);
+//   Serial.println("Blink Example");
+//   delay(1000);
+//   pinMode(LED_BUILTIN, OUTPUT);
+
+// }
+
+
+// void loop() {
+// Serial.println("========================");
+// Serial.println("Loop");
+//   // put your main code here, to run repeatedly:
+//   digitalWrite(LED_BUILTIN, LOW);
+//   delay(2000);
+//   digitalWrite(LED_BUILTIN, HIGH);
+//   delay(2000);
 // }
